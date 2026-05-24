@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WarmupOS — Dashboard</title>
+  <title>WarmupOS</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24; --border: #2a2a3a;
@@ -14,6 +15,28 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
     body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+    /* LOGIN PAGE */
+    .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; position: relative; z-index: 1; }
+    .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 48px; width: 100%; max-width: 420px; }
+    .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .login-logo-icon { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .login-logo-text { font-size: 24px; font-weight: 800; }
+    .login-logo-text span { color: var(--accent); }
+    .login-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .login-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--accent); }
+    .btn { width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Syne', sans-serif; cursor: pointer; border: none; transition: all 0.2s; margin-top: 8px; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #9b7ffd; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login-error { background: rgba(252,92,124,0.1); border: 1px solid rgba(252,92,124,0.3); border-radius: 10px; padding: 12px 16px; color: var(--accent2); font-size: 13px; margin-bottom: 16px; display: none; }
+
+    /* DASHBOARD */
+    .dashboard-page { display: none; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
     header { padding: 32px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
     .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
@@ -22,17 +45,16 @@
     .logo-text { font-size: 22px; font-weight: 800; }
     .logo-text span { color: var(--accent); }
     .header-right { display: flex; align-items: center; gap: 12px; }
+    .user-email { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; width: auto; border-radius: 10px; }
+    .btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+    .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); width: auto; }
+    .btn-green:hover { background: rgba(45,252,142,0.25); }
+    .btn-red { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .status-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-    .btn { padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: #9b7ffd; }
-    .btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
-    .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
-    .btn-green:hover { background: rgba(45,252,142,0.25); }
-    .btn-sm { padding: 7px 14px; font-size: 12px; }
     .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
     .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
     .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); opacity:0.5; }
@@ -52,7 +74,6 @@
     .platform-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
     .status-badge { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; font-family: 'Space Mono', monospace; text-transform: uppercase; }
     .status-badge.active { background: rgba(45,252,142,0.12); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
-    .status-badge.paused { background: rgba(252,220,45,0.12); color: var(--yellow); border: 1px solid rgba(252,220,45,0.3); }
     .last-action { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 16px; padding: 8px 12px; background: var(--surface2); border-radius: 8px; }
     .geelark-id { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .account-actions { display: flex; gap: 8px; margin-top: 16px; }
@@ -66,55 +87,82 @@
     .modal-overlay.open { display: flex; }
     .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 100%; max-width: 440px; }
     .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
-    .form-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
-    .form-input:focus { border-color: var(--accent); }
-    .form-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .modal-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; margin-bottom: 12px; }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; cursor: pointer; margin-bottom: 12px; }
+    .modal-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
     @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .accounts-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="header-inner">
-      <div class="logo">
-        <div class="logo-icon">🔥</div>
-        <div class="logo-text">Warmup<span>OS</span></div>
-      </div>
-      <div class="header-right">
-        <button class="btn btn-ghost btn-sm" onclick="loadAccounts()">↻ Actualiser</button>
-        <button class="btn btn-primary btn-sm" onclick="openModal()">+ Ajouter un compte</button>
-        <div class="status-text"><div class="status-dot"></div>Système actif</div>
-      </div>
-    </div>
-  </header>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Comptes actifs</div>
-      <div class="stat-value" style="color:var(--green)" id="statActifs">—</div>
-      <div class="stat-sub">en warmup</div>
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🔥</div>
+      <div class="login-logo-text">Warmup<span>OS</span></div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Total comptes</div>
-      <div class="stat-value" style="color:var(--accent)" id="statTotal">—</div>
-      <div class="stat-sub">dans Airtable</div>
+    <div class="login-title">Connexion</div>
+    <div class="login-sub">Accède à ton dashboard de warmup</div>
+    <div class="login-error" id="loginError"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="loginEmail" type="email" placeholder="ton@email.com">
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Dernier warmup global</div>
-      <div class="stat-value" style="color:var(--yellow);font-size:20px" id="statDernier">—</div>
-      <div class="stat-sub">sur l'ensemble des comptes</div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input class="form-input" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
     </div>
+    <button class="btn btn-primary" id="loginBtn" onclick="login()">Se connecter</button>
   </div>
+</div>
 
-  <div class="section-header">
-    <div class="section-title">Comptes Instagram / Threads</div>
-  </div>
+<!-- DASHBOARD -->
+<div class="dashboard-page" id="dashboardPage">
+  <div class="container">
+    <header>
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-icon">🔥</div>
+          <div class="logo-text">Warmup<span>OS</span></div>
+        </div>
+        <div class="header-right">
+          <span class="user-email" id="userEmail"></span>
+          <button class="btn btn-ghost btn-sm" onclick="loadAccounts()">↻ Actualiser</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--accent-2)" onclick="openModal()">+ Ajouter</button>
+          <button class="btn btn-red btn-sm" onclick="logout()">Déconnexion</button>
+          <div class="status-text"><div class="status-dot"></div>Actif</div>
+        </div>
+      </div>
+    </header>
 
-  <div id="accountsContainer">
-    <div class="loading"><div class="loading-spinner"></div>Chargement...</div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Comptes actifs</div>
+        <div class="stat-value" style="color:var(--green)" id="statActifs">—</div>
+        <div class="stat-sub">en warmup</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total comptes</div>
+        <div class="stat-value" style="color:var(--accent)" id="statTotal">—</div>
+        <div class="stat-sub">dans Airtable</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dernier warmup</div>
+        <div class="stat-value" style="color:var(--yellow);font-size:20px" id="statDernier">—</div>
+        <div class="stat-sub">sur l'ensemble des comptes</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Mes comptes</div>
+    </div>
+
+    <div id="accountsContainer">
+      <div class="loading"><div class="loading-spinner"></div>Chargement...</div>
+    </div>
   </div>
 </div>
 
@@ -122,30 +170,73 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-title">➕ Ajouter un compte</div>
-    <div class="form-group">
-      <label class="form-label">Nom du compte</label>
-      <input class="form-input" id="inputNom" type="text" placeholder="ex: @mon_compte">
-    </div>
-    <div class="form-group">
-      <label class="form-label">ID Geelark</label>
-      <input class="form-input" id="inputGeelarkId" type="text" placeholder="ex: 619458412127715622">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Plateforme</label>
-      <select class="form-select" id="inputPlateforme">
-        <option value="Instagram">Instagram</option>
-        <option value="Threads">Threads</option>
-      </select>
-    </div>
+    <label class="modal-label">Nom du compte</label>
+    <input class="modal-input" id="inputNom" type="text" placeholder="ex: @mon_compte">
+    <label class="modal-label">ID Geelark</label>
+    <input class="modal-input" id="inputGeelarkId" type="text" placeholder="ex: 619458412127715622">
+    <label class="modal-label">Plateforme</label>
+    <select class="modal-select" id="inputPlateforme">
+      <option value="Instagram">Instagram</option>
+      <option value="Threads">Threads</option>
+    </select>
     <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="addAccount()">Ajouter</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary btn-sm" style="flex:1;width:auto" onclick="addAccount()">Ajouter</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
     </div>
   </div>
 </div>
 
 <script>
+  // Config Supabase — remplace par tes vraies valeurs
+  const SUPABASE_URL = 'https://ibbwoisfffuxxvzxvvfu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_5xB76LyRq-yKT85CJr_wfw_7gQ5a6-O';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
+
+  // Check session au chargement
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      showDashboard(session.user.email);
+    }
+  }
+
+  async function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errorEl = document.getElementById('loginError');
+    
+    btn.disabled = true;
+    btn.textContent = 'Connexion...';
+    errorEl.style.display = 'none';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      errorEl.textContent = 'Email ou mot de passe incorrect';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Se connecter';
+    } else {
+      showDashboard(data.user.email);
+    }
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboardPage').style.display = 'none';
+  }
+
+  function showDashboard(email) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    document.getElementById('userEmail').textContent = email;
+    loadAccounts();
+  }
 
   function timeAgo(dateStr) {
     if (!dateStr) return 'Jamais';
@@ -160,7 +251,7 @@
 
   async function loadAccounts() {
     const container = document.getElementById('accountsContainer');
-    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement depuis Airtable...</div>';
+    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement...</div>';
     try {
       const res = await fetch(`${API}/accounts`);
       const data = await res.json();
@@ -169,7 +260,6 @@
       document.getElementById('statTotal').textContent = records.length;
       document.getElementById('statActifs').textContent = records.length;
 
-      // Dernier warmup global
       let lastDate = null;
       records.forEach(r => {
         const d = r.fields['Dernière action'];
@@ -189,10 +279,6 @@
         const id = f['ID Geelark'] || '';
         const plateforme = f['Plateforme'] || 'Instagram';
         const derniereAction = f['Dernière action'] || null;
-        const statut = f['Statut warmup'] || 'En cours';
-        const statusClass = statut === 'Pausé' ? 'paused' : 'active';
-        const statusLabel = statut === 'Pausé' ? 'Pausé' : 'Actif';
-        const ago = timeAgo(derniereAction);
 
         html += `
           <div class="account-card active" style="animation-delay:${i*0.1}s">
@@ -201,11 +287,11 @@
                 <div class="account-name">${nom}</div>
                 <div class="account-platform"><div class="platform-dot"></div>${plateforme}</div>
               </div>
-              <div class="status-badge ${statusClass}">${statusLabel}</div>
+              <div class="status-badge active">Actif</div>
             </div>
-            <div class="last-action">🕐 Dernier warmup : <strong>${ago}</strong></div>
+            <div class="last-action">🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></div>
             <div class="account-actions">
-              <button class="btn btn-green btn-sm" style="flex:1" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
+              <button class="btn btn-green btn-sm" style="flex:1;width:auto" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
             </div>
             <div class="warmup-result" id="result-${record.id}"></div>
             <div class="geelark-id">ID: ${id}</div>
@@ -214,7 +300,6 @@
       });
       html += '</div>';
       container.innerHTML = html;
-
     } catch (err) {
       container.innerHTML = `<div class="loading" style="color:var(--accent2)">⚠ Erreur: ${err.message}</div>`;
     }
@@ -234,12 +319,12 @@
       resultEl.style.display = 'block';
       if (data.code === 0) {
         resultEl.className = 'warmup-result success';
-        resultEl.textContent = '✓ Warmup lancé avec succès !';
+        resultEl.textContent = '✓ Warmup lancé !';
         btn.textContent = '✓ Lancé';
         setTimeout(() => loadAccounts(), 3000);
       } else {
         resultEl.className = 'warmup-result error';
-        resultEl.textContent = '⚠ ' + (data.msg || 'Erreur inconnue');
+        resultEl.textContent = '⚠ ' + (data.msg || 'Erreur');
         btn.textContent = '▶ Réessayer';
         btn.disabled = false;
       }
@@ -273,14 +358,7 @@
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
   function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
 
-  // Mise à jour du "il y a X min" toutes les minutes sans recharger depuis l'API
-  setInterval(() => {
-    document.querySelectorAll('.last-action strong').forEach(el => {
-      // Force un rechargement léger
-    });
-  }, 60000);
-
-  loadAccounts();
+  checkSession();
   setInterval(loadAccounts, 300000);
 </script>
 </body>
