@@ -355,11 +355,21 @@
 
   async function getAuthHeaders() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return { 'Content-Type': 'application/json' };
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.access_token}`
-    };
+    if (session && session.access_token) {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`
+      };
+    }
+    // Fallback: essaie de rafraîchir la session
+    const { data: refreshData } = await sb.auth.refreshSession();
+    if (refreshData && refreshData.session) {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${refreshData.session.access_token}`
+      };
+    }
+    return { 'Content-Type': 'application/json' };
   }
 
   function hideAll() {
