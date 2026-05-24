@@ -112,7 +112,28 @@
     .modal-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; cursor: pointer; margin-bottom: 12px; }
     .modal-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
     .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
-    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .accounts-grid { grid-template-columns: 1fr; } }
+    .tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 10px 20px; font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; border: none; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .setup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 48px; }
+    .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: all 0.3s; }
+    .setup-card:hover { border-color: var(--accent); box-shadow: 0 8px 32px rgba(124,92,252,0.1); }
+    .setup-card-icon { font-size: 36px; margin-bottom: 16px; }
+    .setup-card-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+    .setup-card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .btn-download { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--accent); color: white; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn-download:hover { background: #9b7ffd; }
+    .setup-steps { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 32px; }
+    .setup-step { display: flex; gap: 16px; margin-bottom: 20px; }
+    .setup-step:last-child { margin-bottom: 0; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .step-content { flex: 1; }
+    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .accounts-grid { grid-template-columns: 1fr; } .setup-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -232,13 +253,76 @@
       </div>
     </div>
 
-    <div class="section-header">
-      <div class="section-title">Mes comptes</div>
+    <!-- ONGLETS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('comptes', this)">📱 Mes comptes</button>
+      <button class="tab" onclick="switchTab('setup', this)">⚙️ Setup Geelark</button>
     </div>
 
-    <div id="accountsContainer">
-      <div class="loading"><div class="loading-spinner"></div>Chargement...</div>
+    <!-- ONGLET COMPTES -->
+    <div class="tab-content active" id="tab-comptes">
+      <div id="accountsContainer">
+        <div class="loading"><div class="loading-spinner"></div>Chargement...</div>
+      </div>
     </div>
+
+    <!-- ONGLET SETUP -->
+    <div class="tab-content" id="tab-setup">
+      <div class="setup-steps">
+        <div style="font-size:20px;font-weight:800;margin-bottom:24px">Comment configurer votre Geelark</div>
+        <div class="setup-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Créer un compte Geelark</div>
+            <div class="step-desc">Rendez-vous sur geelark.com et créez votre compte. Choisissez un plan selon le nombre de profils souhaités.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Ajouter vos profils Instagram/Threads</div>
+            <div class="step-desc">Dans Geelark → Profiles → New Profile. Installez Instagram, connectez-vous à votre compte et notez l'ID numérique de chaque profil.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Importer le Custom Task WarmupOS</div>
+            <div class="step-desc">Téléchargez le fichier JSON ci-dessous et importez-le dans Geelark → Automation → Custom tasks → Import.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Configurer la tâche récurrente</div>
+            <div class="step-desc">Cliquez sur les 3 points du flux → Create recurring task → Interval → 120 minutes → sélectionnez vos profils → Publish.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Ajouter vos profils dans le dashboard</div>
+            <div class="step-desc">Revenez sur l'onglet "Mes comptes" → cliquez sur "+ Ajouter" → entrez le nom et l'ID Geelark de chaque profil.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-grid">
+        <div class="setup-card">
+          <div class="setup-card-icon">📄</div>
+          <div class="setup-card-title">Guide de configuration</div>
+          <div class="setup-card-desc">Guide PDF complet étape par étape pour configurer votre compte Geelark et démarrer le warmup automatique.</div>
+          <a class="btn-download" href="https://flymagency.github.io/warmupos/WarmupOS_Setup_Guide.pdf" download target="_blank">⬇ Télécharger le guide PDF</a>
+        </div>
+        <div class="setup-card">
+          <div class="setup-card-icon">🤖</div>
+          <div class="setup-card-title">Custom Task WarmupOS</div>
+          <div class="setup-card-desc">Le script de warmup à importer dans Geelark. Il automatise le scroll du feed Instagram et des Reels avec comportement humain simulé.</div>
+          <a class="btn-download" href="https://flymagency.github.io/warmupos/Custom_tasks_Warump_EL_ROB_V3_.json" download target="_blank">⬇ Télécharger le Custom Task</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -488,6 +572,13 @@
   function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
   function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
 
   checkSession();
   setInterval(loadAccounts, 300000);
