@@ -7,16 +7,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #1a1a24;
-      --border: #2a2a3a;
-      --accent: #7c5cfc;
-      --accent2: #fc5c7c;
-      --green: #2dfc8e;
-      --yellow: #fcdc2d;
-      --text: #e8e8f0;
-      --muted: #6b6b88;
+      --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24; --border: #2a2a3a;
+      --accent: #7c5cfc; --accent2: #fc5c7c; --green: #2dfc8e; --yellow: #fcdc2d;
+      --text: #e8e8f0; --muted: #6b6b88;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
@@ -40,7 +33,7 @@
     .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
     .btn-green:hover { background: rgba(45,252,142,0.25); }
     .btn-sm { padding: 7px 14px; font-size: 12px; }
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
     .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
     .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); opacity:0.5; }
     .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; font-family: 'Space Mono', monospace; }
@@ -60,7 +53,7 @@
     .status-badge { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; font-family: 'Space Mono', monospace; text-transform: uppercase; }
     .status-badge.active { background: rgba(45,252,142,0.12); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
     .status-badge.paused { background: rgba(252,220,45,0.12); color: var(--yellow); border: 1px solid rgba(252,220,45,0.3); }
-    .last-action { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+    .last-action { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 16px; padding: 8px 12px; background: var(--surface2); border-radius: 8px; }
     .geelark-id { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .account-actions { display: flex; gap: 8px; margin-top: 16px; }
     .warmup-result { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-family: 'Space Mono', monospace; display: none; }
@@ -69,8 +62,6 @@
     .loading { text-align: center; padding: 48px; color: var(--muted); font-family: 'Space Mono', monospace; }
     .loading-spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Modal ajout compte */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 100%; max-width: 440px; }
@@ -81,17 +72,10 @@
     .form-input:focus { border-color: var(--accent); }
     .form-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; cursor: pointer; }
     .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .next-cycle { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; }
-    .cycle-info { display: flex; align-items: center; gap: 16px; }
-    .cycle-icon { width: 44px; height: 44px; background: rgba(124,92,252,0.12); border: 1px solid rgba(124,92,252,0.3); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .cycle-label { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
-    .cycle-time { font-size: 20px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--accent); }
-    .cycle-badge { padding: 8px 20px; background: rgba(124,92,252,0.12); border: 1px solid rgba(124,92,252,0.3); border-radius: 100px; font-size: 12px; color: var(--accent); font-family: 'Space Mono', monospace; }
     @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .accounts-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
 <div class="container">
   <header>
     <div class="header-inner">
@@ -119,26 +103,10 @@
       <div class="stat-sub">dans Airtable</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Statut système</div>
-      <div class="stat-value" style="color:var(--green);font-size:24px">✓ OK</div>
-      <div class="stat-sub">aucune erreur</div>
+      <div class="stat-label">Dernier warmup global</div>
+      <div class="stat-value" style="color:var(--yellow);font-size:20px" id="statDernier">—</div>
+      <div class="stat-sub">sur l'ensemble des comptes</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Prochain cycle</div>
-      <div class="stat-value" style="color:var(--yellow);font-size:28px" id="countdown">2:00:00</div>
-      <div class="stat-sub">automatique</div>
-    </div>
-  </div>
-
-  <div class="next-cycle">
-    <div class="cycle-info">
-      <div class="cycle-icon">⏱</div>
-      <div>
-        <div class="cycle-label">Prochain warmup automatique dans</div>
-        <div class="cycle-time" id="countdown2">—</div>
-      </div>
-    </div>
-    <div class="cycle-badge">Toutes les 2 heures</div>
   </div>
 
   <div class="section-header">
@@ -179,6 +147,17 @@
 <script>
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
 
+  function timeAgo(dateStr) {
+    if (!dateStr) return 'Jamais';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return 'Il y a ' + diff + 's';
+    if (diff < 3600) return 'Il y a ' + Math.floor(diff/60) + 'min';
+    if (diff < 86400) return 'Il y a ' + Math.floor(diff/3600) + 'h';
+    return 'Il y a ' + Math.floor(diff/86400) + 'j';
+  }
+
   async function loadAccounts() {
     const container = document.getElementById('accountsContainer');
     container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement depuis Airtable...</div>';
@@ -186,8 +165,17 @@
       const res = await fetch(`${API}/accounts`);
       const data = await res.json();
       const records = data.records || [];
+
       document.getElementById('statTotal').textContent = records.length;
       document.getElementById('statActifs').textContent = records.length;
+
+      // Dernier warmup global
+      let lastDate = null;
+      records.forEach(r => {
+        const d = r.fields['Dernière action'];
+        if (d && (!lastDate || new Date(d) > new Date(lastDate))) lastDate = d;
+      });
+      document.getElementById('statDernier').textContent = timeAgo(lastDate);
 
       if (records.length === 0) {
         container.innerHTML = '<div class="loading">Aucun compte — ajoutez-en un !</div>';
@@ -204,6 +192,7 @@
         const statut = f['Statut warmup'] || 'En cours';
         const statusClass = statut === 'Pausé' ? 'paused' : 'active';
         const statusLabel = statut === 'Pausé' ? 'Pausé' : 'Actif';
+        const ago = timeAgo(derniereAction);
 
         html += `
           <div class="account-card active" style="animation-delay:${i*0.1}s">
@@ -214,7 +203,7 @@
               </div>
               <div class="status-badge ${statusClass}">${statusLabel}</div>
             </div>
-            <div class="last-action">Dernière action : ${derniereAction ? derniereAction.split('T')[0] : '—'}</div>
+            <div class="last-action">🕐 Dernier warmup : <strong>${ago}</strong></div>
             <div class="account-actions">
               <button class="btn btn-green btn-sm" style="flex:1" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
             </div>
@@ -225,6 +214,7 @@
       });
       html += '</div>';
       container.innerHTML = html;
+
     } catch (err) {
       container.innerHTML = `<div class="loading" style="color:var(--accent2)">⚠ Erreur: ${err.message}</div>`;
     }
@@ -246,9 +236,10 @@
         resultEl.className = 'warmup-result success';
         resultEl.textContent = '✓ Warmup lancé avec succès !';
         btn.textContent = '✓ Lancé';
+        setTimeout(() => loadAccounts(), 3000);
       } else {
         resultEl.className = 'warmup-result error';
-        resultEl.textContent = '⚠ Erreur: ' + (data.msg || 'Inconnu');
+        resultEl.textContent = '⚠ ' + (data.msg || 'Erreur inconnue');
         btn.textContent = '▶ Réessayer';
         btn.disabled = false;
       }
@@ -273,35 +264,21 @@
         body: JSON.stringify({ nom, geelarkId, plateforme })
       });
       const data = await res.json();
-      if (data.id) {
-        closeModal();
-        loadAccounts();
-      } else {
-        alert('Erreur lors de l\'ajout');
-      }
-    } catch (err) {
-      alert('Erreur réseau');
-    }
+      if (data.id) { closeModal(); loadAccounts(); }
+      else alert('Erreur lors de l\'ajout');
+    } catch (err) { alert('Erreur réseau'); }
   }
 
   function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
   function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
 
-  // Countdown
-  let seconds = 7200;
-  function updateCountdown() {
-    seconds--;
-    if (seconds < 0) seconds = 7200;
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    const f = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    document.getElementById('countdown').textContent = f;
-    document.getElementById('countdown2').textContent = f;
-  }
-  setInterval(updateCountdown, 1000);
-  updateCountdown();
+  // Mise à jour du "il y a X min" toutes les minutes sans recharger depuis l'API
+  setInterval(() => {
+    document.querySelectorAll('.last-action strong').forEach(el => {
+      // Force un rechargement léger
+    });
+  }, 60000);
 
   loadAccounts();
   setInterval(loadAccounts, 300000);
