@@ -73,6 +73,8 @@
     .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
     .btn-green:hover { background: rgba(45,252,142,0.25); }
     .btn-red { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); }
+    .btn-danger { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); font-size: 12px; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; transition: all 0.2s; }
+    .btn-danger:hover { background: rgba(252,92,124,0.3); }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     .status-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
@@ -520,6 +522,7 @@
             <div class="last-action">🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></div>
             <div class="account-actions">
               <button class="btn btn-green" style="flex:1" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
+              <button class="btn-danger" onclick="deleteAccount('${record.id}', '${nom}', this)">🗑</button>
             </div>
             <div class="warmup-result" id="result-${record.id}"></div>
             <div class="geelark-id">ID: ${id}</div>
@@ -580,6 +583,31 @@
       if (data.id) { closeModal(); loadAccounts(); }
       else alert('Erreur lors de l\'ajout');
     } catch (err) { alert('Erreur réseau'); }
+  }
+
+  async function deleteAccount(recordId, nom, btn) {
+    if (!confirm('Supprimer "' + nom + '" ? Cette action est irréversible.')) return;
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      const res = await fetch(`${API}/delete-account`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId })
+      });
+      const data = await res.json();
+      if (data.deleted) {
+        loadAccounts();
+      } else {
+        alert('Erreur lors de la suppression');
+        btn.disabled = false;
+        btn.textContent = '🗑';
+      }
+    } catch(err) {
+      alert('Erreur réseau');
+      btn.disabled = false;
+      btn.textContent = '🗑';
+    }
   }
 
   function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
