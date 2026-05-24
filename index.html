@@ -353,6 +353,15 @@
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
 
+  async function getAuthHeaders() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return { 'Content-Type': 'application/json' };
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`
+    };
+  }
+
   function hideAll() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('registerPage').style.display = 'none';
@@ -474,7 +483,8 @@
     const container = document.getElementById('accountsContainer');
     container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement...</div>';
     try {
-      const res = await fetch(`${API}/accounts`);
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API}/accounts`, { headers });
       const data = await res.json();
       const records = data.records || [];
       document.getElementById('statTotal').textContent = records.length;
@@ -525,9 +535,10 @@
     btn.textContent = '⏳ Lancement...';
     const resultEl = document.getElementById('result-' + recordId);
     try {
+      const authHeaders = await getAuthHeaders();
       const res = await fetch(`${API}/warmup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({ profileId, recordId })
       });
       const data = await res.json();
@@ -558,9 +569,10 @@
     const plateforme = document.getElementById('inputPlateforme').value;
     if (!nom || !geelarkId) { alert('Remplis tous les champs !'); return; }
     try {
+      const authHeaders2 = await getAuthHeaders();
       const res = await fetch(`${API}/add-account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders2,
         body: JSON.stringify({ nom, geelarkId, plateforme })
       });
       const data = await res.json();
