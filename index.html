@@ -520,6 +520,11 @@
               <div class="status-badge active">Actif</div>
             </div>
             <div class="last-action">🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></div>
+            <div class="last-action" style="margin-top:6px">📅 Progression : <strong>Jour ${f['Jour warmup'] || 1} / 30</strong>
+              <div style="margin-top:6px;height:4px;background:var(--surface2);border-radius:100px;overflow:hidden">
+                <div style="height:100%;width:${Math.min(((f['Jour warmup']||1)/30)*100,100)}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:100px"></div>
+              </div>
+            </div>
             <div class="account-actions">
               <button class="btn btn-green" style="flex:1" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
               <button class="btn-danger" onclick="deleteAccount('${record.id}', '${nom}', this)">🗑</button>
