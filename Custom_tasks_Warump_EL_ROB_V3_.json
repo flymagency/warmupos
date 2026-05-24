@@ -1,0 +1,154 @@
+{
+  "content": {
+    "contents": [
+      {
+        "config": {
+          "packgename": "com.instagram.android"
+        },
+        "id": "5ab9472f-9023-4c57-875b-1a4ae2bf9bab",
+        "isNewAdd": false,
+        "name": "Open App",
+        "type": "openApp"
+      },
+      {
+        "config": {
+          "children": [
+            {
+              "config": {
+                "_a": 3000,
+                "_b": 6000,
+                "direction": "top",
+                "distanceMax": "1000",
+                "distanceMin": "100",
+                "position": [
+                  "540",
+                  "960"
+                ],
+                "randomDistance": 50,
+                "randomWheelSleepTime": [
+                  3000,
+                  6000
+                ]
+              },
+              "id": "5a5feaa5-38c3-44bf-a0f0-8ad759306089",
+              "isNewAdd": false,
+              "name": "Scroll",
+              "type": "scrollPage"
+            },
+            {
+              "config": {
+                "timeout": 8000,
+                "timeoutType": "fixedValue"
+              },
+              "id": "49465c38-d56f-4654-8cf9-eef45069c7df",
+              "isNewAdd": false,
+              "name": "Time",
+              "type": "waitTime"
+            }
+          ],
+          "serialType": "fixedValue",
+          "times": "30"
+        },
+        "id": "078ad1ba-862a-48f1-a750-17d78ed17f15",
+        "isNewAdd": false,
+        "name": "For Loop Times",
+        "type": "forTimes"
+      },
+      {
+        "config": {
+          "doubleClick": false,
+          "filterCollection": [
+            [
+              {
+                "content": "com.instagram.android:id/clips_tab",
+                "filterType": "equal",
+                "type": "id"
+              }
+            ]
+          ],
+          "hiddenChildren": false,
+          "randomDistance": 0,
+          "searchTime": 5000,
+          "serial": 1,
+          "serialType": "fixedValue",
+          "useOffset": false
+        },
+        "id": "f3b01560-ccba-4e7d-b5df-024929d32e70",
+        "isNewAdd": false,
+        "name": "Click",
+        "type": "click"
+      },
+      {
+        "config": {
+          "timeout": 3000,
+          "timeoutType": "fixedValue"
+        },
+        "enabled": true,
+        "id": "fd64b772-a8a4-4a4a-82d0-54d67d2e5583",
+        "isNewAdd": false,
+        "name": "Time",
+        "type": "waitTime"
+      },
+      {
+        "config": {
+          "children": [
+            {
+              "config": {
+                "_a": 3000,
+                "_b": 6000,
+                "direction": "top",
+                "distanceMax": "1000",
+                "distanceMin": "100",
+                "position": [
+                  "540",
+                  "960"
+                ],
+                "randomDistance": 50,
+                "randomWheelSleepTime": [
+                  3000,
+                  6000
+                ]
+              },
+              "id": "ec6a2d93-afe2-4081-8373-326977c848f1",
+              "isNewAdd": false,
+              "name": "Scroll",
+              "type": "scrollPage"
+            },
+            {
+              "config": {
+                "timeout": 8000,
+                "timeoutType": "fixedValue"
+              },
+              "id": "91ba721c-ae06-4752-9299-a2b623b81d53",
+              "isNewAdd": false,
+              "name": "Time",
+              "type": "waitTime"
+            }
+          ],
+          "serialType": "fixedValue",
+          "times": "25"
+        },
+        "id": "3e5cfacb-c15a-4db2-af5d-03b06abe841b",
+        "isNewAdd": false,
+        "name": "For Loop Times",
+        "type": "forTimes"
+      },
+      {
+        "config": {
+          "packgename": "com.instagram.android",
+          "timeout": 30000
+        },
+        "id": "04cc4aeb-11bd-428a-aff1-c376d8d004ff",
+        "isNewAdd": false,
+        "name": "Close App",
+        "type": "stopApp"
+      }
+    ],
+    "errorType": "skip",
+    "isDebug": false,
+    "startParamMap": [],
+    "contentType": "phone"
+  },
+  "desc": "This is a custom task",
+  "title": "Custom tasks Warump EL ROB V3 "
+}
