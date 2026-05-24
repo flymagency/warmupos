@@ -495,7 +495,7 @@
       document.getElementById('statActifs').textContent = records.length;
       let lastDate = null;
       records.forEach(r => {
-        const d = r.fields['Dernière action'];
+        const d = r.fields['Derniere action'];
         if (d && (!lastDate || new Date(d) > new Date(lastDate))) lastDate = d;
       });
       document.getElementById('statDernier').textContent = timeAgo(lastDate);
@@ -509,7 +509,7 @@
         const nom = f['Nom du compte'] || 'Compte ' + (i+1);
         const id = f['ID Geelark'] || '';
         const plateforme = f['Plateforme'] || 'Instagram';
-        const derniereAction = f['Dernière action'] || null;
+        const derniereAction = f['Derniere action'] || null;
         html += `
           <div class="account-card active" style="animation-delay:${i*0.1}s">
             <div class="account-header">
