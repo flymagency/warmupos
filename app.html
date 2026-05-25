@@ -170,7 +170,31 @@
     </div>
     <button class="btn-auth btn-accent" id="loginBtn" onclick="login()">Se connecter</button>
     <div class="auth-switch">Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a></div>
-    <div class="auth-switch" style="margin-top:8px"><a href="pricing.html" style="color:var(--muted);font-size:12px">← Voir les tarifs</a></div>
+    <div class="auth-switch" style="margin-top:8px">
+      <a onclick="showForgot()" style="color:var(--muted);font-size:12px;cursor:pointer">Mot de passe oublié ?</a>
+      &nbsp;·&nbsp;
+      <a href="pricing.html" style="color:var(--muted);font-size:12px">← Voir les tarifs</a>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div class="auth-page" id="forgotPage" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🔥</div>
+      <div class="auth-logo-text">Warmup<span>OS</span></div>
+    </div>
+    <div class="auth-title">Mot de passe oublié</div>
+    <div class="auth-sub">Entre ton email — on t'envoie un lien pour réinitialiser ton mot de passe.</div>
+    <div class="auth-error" id="forgotError"></div>
+    <div class="auth-success" id="forgotSuccess"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="forgotEmail" type="email" placeholder="ton@email.com">
+    </div>
+    <button class="btn-auth btn-accent" id="forgotBtn" onclick="sendReset()">Envoyer le lien</button>
+    <div class="auth-switch" style="margin-top:16px"><a onclick="showLogin()" style="cursor:pointer">← Retour à la connexion</a></div>
   </div>
 </div>
 
@@ -404,6 +428,46 @@
     document.getElementById('registerPage').style.display = 'none';
     document.getElementById('pendingPage').style.display = 'none';
     document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('forgotPage').style.display = 'none';
+  }
+
+  function showForgot() {
+    hideAll();
+    document.getElementById('forgotPage').style.display = 'flex';
+  }
+
+  async function sendReset() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const btn = document.getElementById('forgotBtn');
+    const errorEl = document.getElementById('forgotError');
+    const successEl = document.getElementById('forgotSuccess');
+
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (!email) {
+      errorEl.textContent = 'Entre ton email';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Envoi...';
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://flymagency.github.io/app/app.html'
+    });
+
+    if (error) {
+      errorEl.textContent = 'Erreur : ' + error.message;
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Envoyer le lien';
+    } else {
+      successEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+      successEl.style.display = 'block';
+      btn.textContent = 'Email envoyé ✓';
+    }
   }
 
   function showLogin() {
