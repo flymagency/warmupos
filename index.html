@@ -232,6 +232,7 @@
         </div>
         <div class="header-right">
           <span class="user-email" id="userEmail"></span>
+          <span id="planBadge" style="padding:4px 12px;border-radius:100px;font-size:11px;font-family:'Space Mono',monospace;background:rgba(124,92,252,0.15);color:var(--accent);border:1px solid rgba(124,92,252,0.3)">—</span>
           <button class="btn btn-ghost" onclick="loadAccounts()">↻ Actualiser</button>
           <button class="btn btn-primary" onclick="openModal()">+ Ajouter</button>
           <button class="btn btn-red" onclick="logout()">Déconnexion</button>
@@ -359,6 +360,21 @@
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
 
   let currentUserId = null;
+
+  async function loadPlan() {
+    const userId = await getCurrentUserId();
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API}/plan?userId=${userId}`);
+      const data = await res.json();
+      const planNames = { starter: '⚡ Starter', pro: '🚀 Pro', agency: '🏢 Agency' };
+      const badge = document.getElementById('planBadge');
+      if (badge) {
+        const limit = data.limit === Infinity ? '∞' : data.limit;
+        badge.textContent = `${planNames[data.plan] || data.plan} — ${data.used}/${limit} comptes`;
+      }
+    } catch(e) {}
+  }
 
   async function getCurrentUserId() {
     if (currentUserId) return currentUserId;
