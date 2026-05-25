@@ -605,7 +605,12 @@
         resultEl.className = 'warmup-result success';
         resultEl.textContent = '✓ Warmup lancé !';
         btn.textContent = '✓ Lancé';
-        setTimeout(() => loadAccounts(), 3000);
+        // Met à jour le badge statut immédiatement
+        const statusEl = document.getElementById('status-' + recordId);
+        if (statusEl) {
+          statusEl.className = 'status-running';
+          statusEl.textContent = 'En attente...';
+        }
       } else {
         resultEl.className = 'warmup-result error';
         resultEl.textContent = '⚠ ' + (data.msg || 'Erreur');
