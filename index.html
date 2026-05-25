@@ -360,12 +360,13 @@
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
 
   let currentUserId = null;
+  let currentUserEmail = null;
 
   async function loadPlan() {
     const userId = await getCurrentUserId();
     if (!userId) return;
     try {
-      const res = await fetch(`${API}/plan?userId=${userId}`);
+      const res = await fetch(`${API}/plan?userId=${currentUserEmail || userId}`);
       const data = await res.json();
       const planNames = { starter: '⚡ Starter', pro: '🚀 Pro', agency: '🏢 Agency' };
       const badge = document.getElementById('planBadge');
@@ -652,7 +653,7 @@
       const res = await fetch(`${API}/add-account`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom, geelarkId, plateforme, userId: userId2 })
+        body: JSON.stringify({ nom, geelarkId, plateforme, userId: currentUserEmail || userId2 })
       });
       const data = await res.json();
       if (data.id) { closeModal(); loadAccounts(); }
