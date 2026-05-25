@@ -363,10 +363,9 @@
   let currentUserEmail = null;
 
   async function loadPlan() {
-    const userId = await getCurrentUserId();
-    if (!userId) return;
+    if (!currentUserEmail) return;
     try {
-      const res = await fetch(`${API}/plan?userId=${currentUserEmail || userId}`);
+      const res = await fetch(`${API}/plan?userId=${encodeURIComponent(currentUserEmail)}`);
       const data = await res.json();
       const planNames = { starter: '⚡ Starter', pro: '🚀 Pro', agency: '🏢 Agency' };
       const badge = document.getElementById('planBadge');
@@ -374,7 +373,7 @@
         const limitDisplay = (!data.limit || data.limit >= 9999) ? '∞' : data.limit;
         badge.textContent = `${planNames[data.plan] || data.plan} — ${data.used}/${limitDisplay} comptes`;
       }
-    } catch(e) {}
+    } catch(e) { console.log('loadPlan error', e); }
   }
 
   async function getCurrentUserId() {
@@ -417,10 +416,13 @@
       .single();
 
     if (data && data.activated === true) {
+      currentUserId = user.id;
+      currentUserEmail = user.email;
       hideAll();
       document.getElementById('dashboardPage').style.display = 'block';
       document.getElementById('userEmail').textContent = user.email;
       loadAccounts();
+      loadPlan();
     } else {
       hideAll();
       document.getElementById('pendingPage').style.display = 'flex';
