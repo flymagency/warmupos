@@ -73,6 +73,9 @@
     .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
     .btn-green:hover { background: rgba(45,252,142,0.25); }
     .btn-red { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); }
+    .status-running { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(45,252,142,0.12); color: var(--green); border: 1px solid rgba(45,252,142,0.3); border-radius: 100px; font-size: 11px; font-family: 'Space Mono', monospace; }
+    .status-running::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1s infinite; }
+    .status-idle { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 100px; font-size: 11px; font-family: 'Space Mono', monospace; }
     .btn-danger { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); font-size: 12px; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; transition: all 0.2s; }
     .btn-danger:hover { background: rgba(252,92,124,0.3); }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
@@ -522,7 +525,10 @@
               </div>
               <div class="status-badge active">Actif</div>
             </div>
-            <div class="last-action">🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></div>
+            <div class="last-action" style="display:flex;align-items:center;justify-content:space-between">
+              <span>🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></span>
+              <span id="status-${record.id}" class="status-idle">Inactif</span>
+            </div>
             <div class="last-action" style="margin-top:6px">📅 Progression : <strong>Jour ${f['Jour warmup'] || 1} / 30</strong>
               <div style="margin-top:6px;height:4px;background:var(--surface2);border-radius:100px;overflow:hidden">
                 <div style="height:100%;width:${Math.min(((f['Jour warmup']||1)/30)*100,100)}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:100px"></div>
@@ -538,9 +544,49 @@
       });
       html += '</div>';
       container.innerHTML = html;
+      // Vérifie les statuts en temps réel
+      checkStatuses(records);
+      // Revérifie toutes les 30 secondes
+      clearInterval(window.statusInterval);
+      window.statusInterval = setInterval(() => checkStatuses(records), 30000);
     } catch (err) {
       container.innerHTML = `<div class="loading" style="color:var(--accent2)">⚠ Erreur: ${err.message}</div>`;
     }
+  }
+
+  async function checkStatuses(records) {
+    const taskIds = records
+      .filter(r => r.fields['task_id'])
+      .map(r => r.fields['task_id']);
+    
+    if (taskIds.length === 0) return;
+
+    try {
+      const res = await fetch(`${API}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskIds })
+      });
+      const data = await res.json();
+      if (!data.data || !data.data.items) return;
+
+      // Map task_id -> envId -> status
+      data.data.items.forEach(task => {
+        records.forEach(record => {
+          if (record.fields['task_id'] === task.id) {
+            const statusEl = document.getElementById('status-' + record.id);
+            if (!statusEl) return;
+            if (task.status === 1 || task.status === 2) {
+              statusEl.className = 'status-running';
+              statusEl.textContent = task.status === 1 ? 'En attente' : 'En cours...';
+            } else {
+              statusEl.className = 'status-idle';
+              statusEl.textContent = task.status === 3 ? 'Terminé' : 'Inactif';
+            }
+          }
+        });
+      });
+    } catch(e) {}
   }
 
   async function launchWarmup(profileId, recordId, btn) {
