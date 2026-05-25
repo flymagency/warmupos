@@ -510,7 +510,7 @@
     const container = document.getElementById('accountsContainer');
     container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement...</div>';
     try {
-      const userId = await getCurrentUserId();
+      const userId = currentUserEmail || await getCurrentUserId();
       const res = await fetch(`${API}/accounts?userId=${userId || ''}`, {
         headers: { 'Content-Type': 'application/json' }
       });
