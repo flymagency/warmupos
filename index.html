@@ -371,8 +371,8 @@
       const planNames = { starter: '⚡ Starter', pro: '🚀 Pro', agency: '🏢 Agency' };
       const badge = document.getElementById('planBadge');
       if (badge) {
-        const limit = data.limit === Infinity ? '∞' : data.limit;
-        badge.textContent = `${planNames[data.plan] || data.plan} — ${data.used}/${limit} comptes`;
+        const limitDisplay = (!data.limit || data.limit >= 9999) ? '∞' : data.limit;
+        badge.textContent = `${planNames[data.plan] || data.plan} — ${data.used}/${limitDisplay} comptes`;
       }
     } catch(e) {}
   }
