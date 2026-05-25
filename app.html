@@ -667,8 +667,8 @@
     try {
       const res = await fetch(`${API}/status`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
-        body: JSON.stringify({ taskIds })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskIds, secret: WSECRET })
       });
       const data = await res.json();
       if (!data.data || !data.data.items) return;
@@ -699,8 +699,8 @@
     try {
       const res = await fetch(`${API}/warmup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
-        body: JSON.stringify({ profileId, recordId })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileId, recordId, secret: WSECRET })
       });
       const data = await res.json();
       resultEl.style.display = 'block';
@@ -738,8 +738,8 @@
       const userId2 = await getCurrentUserId();
       const res = await fetch(`${API}/add-account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
-        body: JSON.stringify({ nom, geelarkId, plateforme, userId: currentUserEmail || userId2 })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom, geelarkId, plateforme, userId: currentUserEmail || userId2, secret: WSECRET })
       });
       const data = await res.json();
       if (data.id) { closeModal(); loadAccounts(); }
@@ -754,8 +754,8 @@
     try {
       const res = await fetch(`${API}/delete-account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
-        body: JSON.stringify({ recordId })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId, secret: WSECRET })
       });
       const data = await res.json();
       if (data.deleted) {
