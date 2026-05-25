@@ -173,7 +173,7 @@
       <input class="form-input" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
     </div>
     <button class="btn-auth btn-accent" id="loginBtn" onclick="login()">Se connecter</button>
-    <div class="auth-switch">Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a></div>
+    <div class="auth-switch">Pas encore de compte ? <a onclick="showRegister()" style="cursor:pointer">Créer un compte</a></div>
     <div class="auth-switch" style="margin-top:8px">
       <a onclick="showForgot()" style="color:var(--muted);font-size:12px;cursor:pointer">Mot de passe oublié ?</a>
       &nbsp;·&nbsp;
@@ -226,7 +226,7 @@
       <input class="form-input" id="registerPassword2" type="password" placeholder="••••••••">
     </div>
     <button class="btn-auth btn-accent" id="registerBtn" onclick="register()">Créer mon compte</button>
-    <div class="auth-switch">Déjà un compte ? <a onclick="showLogin()">Se connecter</a></div>
+    <div class="auth-switch">Déjà un compte ? <a onclick="showLogin()" style="cursor:pointer">Se connecter</a></div>
   </div>
 </div>
 
@@ -489,6 +489,9 @@
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       handleUser(session.user);
+    } else {
+      // Par défaut affiche l'inscription
+      showRegister();
     }
   }
 
