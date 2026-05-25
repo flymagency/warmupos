@@ -398,6 +398,7 @@
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
   const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
+  const WSECRET = 'wos_9x2k7p4m1n8q3r6t';
 
   let currentUserId = null;
   let currentUserEmail = null;
@@ -597,7 +598,7 @@
     try {
       const userId = currentUserEmail || await getCurrentUserId();
       const res = await fetch(`${API}/accounts?userId=${userId || ''}`, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET }
       });
       const data = await res.json();
       const records = data.records || [];
@@ -668,7 +669,7 @@
     try {
       const res = await fetch(`${API}/status`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
         body: JSON.stringify({ taskIds })
       });
       const data = await res.json();
@@ -700,7 +701,7 @@
     try {
       const res = await fetch(`${API}/warmup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
         body: JSON.stringify({ profileId, recordId })
       });
       const data = await res.json();
@@ -739,7 +740,7 @@
       const userId2 = await getCurrentUserId();
       const res = await fetch(`${API}/add-account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
         body: JSON.stringify({ nom, geelarkId, plateforme, userId: currentUserEmail || userId2 })
       });
       const data = await res.json();
@@ -755,7 +756,7 @@
     try {
       const res = await fetch(`${API}/delete-account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Worker-Secret': WSECRET },
         body: JSON.stringify({ recordId })
       });
       const data = await res.json();
