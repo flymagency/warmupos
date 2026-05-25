@@ -3,596 +3,705 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WarmupOS — Pricing</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>WarmupOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #1a1a24;
-      --border: #2a2a3a;
-      --accent: #7c5cfc;
-      --green: #2dfc8e;
-      --yellow: #fcdc2d;
-      --text: #e8e8f0;
-      --muted: #6b6b88;
+      --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24; --border: #2a2a3a;
+      --accent: #7c5cfc; --accent2: #fc5c7c; --green: #2dfc8e; --yellow: #fcdc2d;
+      --text: #e8e8f0; --muted: #6b6b88;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    /* AUTH PAGES */
+    .auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; position: relative; z-index: 1; }
+    .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 48px; width: 100%; max-width: 420px; }
+    .auth-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .auth-logo-icon { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .auth-logo-text { font-size: 24px; font-weight: 800; }
+    .auth-logo-text span { color: var(--accent); }
+    .auth-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .auth-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
+    .form-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--accent); }
+    .btn-auth { width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Syne', sans-serif; cursor: pointer; border: none; transition: all 0.2s; margin-top: 8px; }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: #9b7ffd; }
+    .btn-accent:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--muted); border: 1px solid var(--border); margin-top: 12px; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+    .auth-error { background: rgba(252,92,124,0.1); border: 1px solid rgba(252,92,124,0.3); border-radius: 10px; padding: 12px 16px; color: var(--accent2); font-size: 13px; margin-bottom: 16px; display: none; }
+    .auth-success { background: rgba(45,252,142,0.1); border: 1px solid rgba(45,252,142,0.3); border-radius: 10px; padding: 12px 16px; color: var(--green); font-size: 13px; margin-bottom: 16px; display: none; }
+    .auth-switch { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
+    .auth-switch a { color: var(--accent); cursor: pointer; text-decoration: none; }
+    .auth-switch a:hover { text-decoration: underline; }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: 
-        linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
+    /* PENDING PAGE */
+    .pending-page { display: none; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; position: relative; z-index: 1; }
+    .pending-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 48px; width: 100%; max-width: 480px; text-align: center; }
+    .pending-icon { font-size: 64px; margin-bottom: 24px; }
+    .pending-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+    .pending-text { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+    .pending-badge { display: inline-block; padding: 8px 20px; background: rgba(252,220,45,0.12); border: 1px solid rgba(252,220,45,0.3); border-radius: 100px; font-size: 12px; color: var(--yellow); font-family: 'Space Mono', monospace; margin-bottom: 24px; }
+    .pending-steps { text-align: left; background: var(--surface2); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+    .pending-step { display: flex; align-items: center; gap: 12px; font-size: 14px; margin-bottom: 12px; }
+    .pending-step:last-child { margin-bottom: 0; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .step-num.done { background: var(--green); color: #0a0a0f; }
 
-    /* Glow */
-    .glow {
-      position: fixed;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%);
-      pointer-events: none;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 0;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* NAV */
-    nav {
-      padding: 24px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 80px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    .logo-text {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
+    /* DASHBOARD */
+    .dashboard-page { display: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    header { padding: 32px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .logo-text { font-size: 22px; font-weight: 800; }
     .logo-text span { color: var(--accent); }
-
-    .nav-cta {
-      padding: 10px 24px;
-      background: var(--accent);
-      color: white;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .nav-cta:hover { background: #9b7ffd; transform: scale(1.02); }
-
-    /* HERO */
-    .hero {
-      text-align: center;
-      margin-bottom: 80px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: rgba(45,252,142,0.08);
-      border: 1px solid rgba(45,252,142,0.2);
-      border-radius: 100px;
-      font-size: 12px;
-      color: var(--green);
-      font-family: 'Space Mono', monospace;
-      margin-bottom: 24px;
-      animation: fadeDown 0.6s ease forwards;
-    }
-
-    .hero-badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .user-email { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+    .btn { padding: 7px 14px; font-size: 12px; border-radius: 10px; font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #9b7ffd; }
+    .btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+    .btn-green { background: rgba(45,252,142,0.15); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
+    .btn-green:hover { background: rgba(45,252,142,0.25); }
+    .btn-red { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); }
+    .status-running { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(45,252,142,0.12); color: var(--green); border: 1px solid rgba(45,252,142,0.3); border-radius: 100px; font-size: 11px; font-family: 'Space Mono', monospace; }
+    .status-running::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1s infinite; }
+    .status-idle { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 100px; font-size: 11px; font-family: 'Space Mono', monospace; }
+    .btn-danger { background: rgba(252,92,124,0.15); color: var(--accent2); border: 1px solid rgba(252,92,124,0.3); font-size: 12px; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; transition: all 0.2s; }
+    .btn-danger:hover { background: rgba(252,92,124,0.3); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
-    .hero-title {
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -2px;
-      margin-bottom: 20px;
-      animation: fadeUp 0.6s 0.1s ease forwards;
-      opacity: 0;
-    }
-
-    .hero-title span { color: var(--accent); }
-
-    .hero-sub {
-      font-size: 18px;
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
-      animation: fadeUp 0.6s 0.2s ease forwards;
-      opacity: 0;
-    }
-
-    /* TOGGLE BILLING */
-    .billing-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 6px;
-      margin-bottom: 64px;
-      animation: fadeUp 0.6s 0.3s ease forwards;
-      opacity: 0;
-    }
-
-    .toggle-btn {
-      padding: 8px 20px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'Syne', sans-serif;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      transition: all 0.2s;
-    }
-
-    .toggle-btn.active {
-      background: var(--accent);
-      color: white;
-    }
-
-    .save-badge {
-      padding: 4px 10px;
-      background: rgba(252,220,45,0.12);
-      color: var(--yellow);
-      border: 1px solid rgba(252,220,45,0.3);
-      border-radius: 100px;
-      font-size: 11px;
-      font-family: 'Space Mono', monospace;
-    }
-
-    /* PRICING CARDS */
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-bottom: 80px;
-      animation: fadeUp 0.6s 0.4s ease forwards;
-      opacity: 0;
-    }
-
-    .plan-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s;
-    }
-
-    .plan-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(124,92,252,0.12);
-    }
-
-    .plan-card.popular {
-      border-color: var(--accent);
-      background: linear-gradient(135deg, rgba(124,92,252,0.08), var(--surface));
-    }
-
-    .plan-card.popular::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--green));
-    }
-
-    .popular-badge {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 5px 12px;
-      background: var(--accent);
-      color: white;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'Space Mono', monospace;
-    }
-
-    .plan-name {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-      margin-bottom: 16px;
-    }
-
-    .plan-price {
-      margin-bottom: 8px;
-    }
-
-    .plan-amount {
-      font-size: 52px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -2px;
-    }
-
-    .plan-amount span {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0;
-    }
-
-    .plan-period {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      height: 20px;
-    }
-
-    .plan-annual-note {
-      font-size: 12px;
-      color: var(--green);
-      font-family: 'Space Mono', monospace;
-      margin-bottom: 24px;
-      height: 18px;
-    }
-
-    .plan-divider {
-      height: 1px;
-      background: var(--border);
-      margin-bottom: 24px;
-    }
-
-    .plan-features {
-      list-style: none;
-      margin-bottom: 32px;
-    }
-
-    .plan-features li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-
-    .plan-features li::before {
-      content: '✓';
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(45,252,142,0.12);
-      color: var(--green);
-      font-size: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-weight: 700;
-    }
-
-    .plan-features li.muted {
-      color: var(--muted);
-    }
-
-    .plan-features li.muted::before {
-      content: '—';
-      background: var(--surface2);
-      color: var(--muted);
-    }
-
-    .plan-cta {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      font-family: 'Syne', sans-serif;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-    }
-
-    .plan-cta.primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .plan-cta.primary:hover { background: #9b7ffd; }
-
-    .plan-cta.ghost {
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .plan-cta.ghost:hover { border-color: var(--accent); }
-
-    /* FAQ */
-    .faq-title {
-      text-align: center;
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 40px;
-      letter-spacing: -1px;
-    }
-
-    .faq-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-bottom: 80px;
-    }
-
-    .faq-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      transition: border-color 0.2s;
-    }
-
-    .faq-item:hover { border-color: var(--accent); }
-
-    .faq-q {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .faq-a {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 0;
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-    }
-
-    @media (max-width: 768px) {
-      .pricing-grid { grid-template-columns: 1fr; }
-      .faq-grid { grid-template-columns: 1fr; }
-      .hero-title { letter-spacing: -1px; }
-    }
+    .status-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); opacity:0.5; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; font-family: 'Space Mono', monospace; }
+    .stat-value { font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .stat-sub { font-size: 12px; color: var(--muted); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-family: 'Space Mono', monospace; }
+    .accounts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 48px; }
+    .account-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; transition: all 0.3s; animation: fadeIn 0.4s ease forwards; opacity: 0; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .account-card:hover { border-color: var(--accent); box-shadow: 0 8px 32px rgba(124,92,252,0.1); }
+    .account-card.active::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--accent), var(--green)); }
+    .account-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .account-name { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+    .account-platform { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; display: flex; align-items: center; gap: 6px; }
+    .platform-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .status-badge { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; font-family: 'Space Mono', monospace; text-transform: uppercase; }
+    .status-badge.active { background: rgba(45,252,142,0.12); color: var(--green); border: 1px solid rgba(45,252,142,0.3); }
+    .last-action { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 16px; padding: 8px 12px; background: var(--surface2); border-radius: 8px; }
+    .geelark-id { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .account-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .warmup-result { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-family: 'Space Mono', monospace; display: none; }
+    .warmup-result.success { background: rgba(45,252,142,0.1); color: var(--green); border: 1px solid rgba(45,252,142,0.2); }
+    .warmup-result.error { background: rgba(252,92,124,0.1); color: var(--accent2); border: 1px solid rgba(252,92,124,0.2); }
+    .loading { text-align: center; padding: 48px; color: var(--muted); font-family: 'Space Mono', monospace; }
+    .loading-spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 100%; max-width: 440px; }
+    .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; }
+    .modal-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; margin-bottom: 12px; }
+    .modal-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; cursor: pointer; margin-bottom: 12px; }
+    .modal-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 10px 20px; font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif; cursor: pointer; border: none; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .setup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 48px; }
+    .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: all 0.3s; }
+    .setup-card:hover { border-color: var(--accent); box-shadow: 0 8px 32px rgba(124,92,252,0.1); }
+    .setup-card-icon { font-size: 36px; margin-bottom: 16px; }
+    .setup-card-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+    .setup-card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .btn-download { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--accent); color: white; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn-download:hover { background: #9b7ffd; }
+    .setup-steps { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 32px; }
+    .setup-step { display: flex; gap: 16px; margin-bottom: 20px; }
+    .setup-step:last-child { margin-bottom: 0; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .step-content { flex: 1; }
+    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .accounts-grid { grid-template-columns: 1fr; } .setup-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-<div class="glow"></div>
 
-<div class="container">
-  <nav>
-    <a href="#" class="logo">
-      <div class="logo-icon">🔥</div>
-      <div class="logo-text">Warmup<span>OS</span></div>
-    </a>
-    <a href="index.html" class="nav-cta">Commencer →</a>
-  </nav>
-
-  <div class="hero">
-    <div class="hero-badge">Warmup automatique 24/7</div>
-    <h1 class="hero-title">Un prix simple.<br>Des résultats <span>réels</span>.</h1>
-    <p class="hero-sub">automatisez le warmup de vos comptes instagram et threads. augmentez votre portée organique sans effort.</p>
-
-    <div class="billing-toggle">
-      <button class="toggle-btn active" id="btnMonthly" onclick="setBilling('monthly')">Mensuel</button>
-      <button class="toggle-btn" id="btnAnnual" onclick="setBilling('annual')">Annuel <span class="save-badge">-17%</span></button>
+<!-- LOGIN -->
+<div class="auth-page" id="loginPage">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🔥</div>
+      <div class="auth-logo-text">Warmup<span>OS</span></div>
     </div>
+    <div class="auth-title">Connexion</div>
+    <div class="auth-sub">Accède à ton dashboard de warmup</div>
+    <div class="auth-error" id="loginError"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="loginEmail" type="email" placeholder="ton@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input class="form-input" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="btn-auth btn-accent" id="loginBtn" onclick="login()">Se connecter</button>
+    <div class="auth-switch">Pas encore de compte ? <a onclick="showRegister()">Créer un compte</a></div>
+    <div class="auth-switch" style="margin-top:8px"><a href="index.html" style="color:var(--muted);font-size:12px">← Voir les tarifs</a></div>
   </div>
-
-  <div class="pricing-grid">
-
-    <!-- STARTER -->
-    <div class="plan-card">
-      <div class="plan-name">Starter</div>
-      <div class="plan-price">
-        <div class="plan-amount" id="price-starter">20<span>€</span></div>
-      </div>
-      <div class="plan-period">/mois — facturation mensuelle</div>
-      <div class="plan-annual-note" id="note-starter"></div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li>3 comptes Instagram/Threads</li>
-        <li>Warmup automatique toutes les 2h</li>
-        <li>Dashboard de monitoring</li>
-        <li>Scroll feed + Reels</li>
-        <li>Support par email</li>
-        <li class="muted">Annuel non disponible</li>
-      </ul>
-      <a href="index.html" class="plan-cta ghost">Commencer →</a>
-    </div>
-
-    <!-- PRO -->
-    <div class="plan-card popular">
-      <div class="popular-badge">Populaire</div>
-      <div class="plan-name">Pro</div>
-      <div class="plan-price">
-        <div class="plan-amount" id="price-pro">50<span>€</span></div>
-      </div>
-      <div class="plan-period" id="period-pro">/mois — facturation mensuelle</div>
-      <div class="plan-annual-note" id="note-pro"></div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li>10 comptes Instagram/Threads</li>
-        <li>Warmup automatique toutes les 2h</li>
-        <li>Dashboard de monitoring</li>
-        <li>Scroll feed + Reels + Likes</li>
-        <li>Support prioritaire</li>
-        <li>Option annuel disponible</li>
-      </ul>
-      <a href="index.html" class="plan-cta primary">Commencer →</a>
-    </div>
-
-    <!-- AGENCY -->
-    <div class="plan-card">
-      <div class="plan-name">Agency</div>
-      <div class="plan-price">
-        <div class="plan-amount" id="price-agency">100<span>€</span></div>
-      </div>
-      <div class="plan-period" id="period-agency">/mois — facturation mensuelle</div>
-      <div class="plan-annual-note" id="note-agency"></div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li>Comptes illimités</li>
-        <li>Warmup automatique toutes les 2h</li>
-        <li>Dashboard de monitoring</li>
-        <li>Scroll feed + Reels + Likes</li>
-        <li>Support dédié</li>
-        <li>Option annuel disponible</li>
-      </ul>
-      <a href="index.html" class="plan-cta ghost">Commencer →</a>
-    </div>
-
-  </div>
-
-  <!-- FAQ -->
-  <div class="faq-title">Questions fréquentes</div>
-  <div class="faq-grid">
-    <div class="faq-item">
-      <div class="faq-q">Comment fonctionne le warmup ?</div>
-      <div class="faq-a">WarmupOS simule un comportement humain naturel sur Instagram et Threads — scroll du feed, visionnage des Reels, likes aléatoires. Tout est automatisé toutes les 2 heures.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Ai-je besoin d'un compte Geelark ?</div>
-      <div class="faq-a">Oui, chaque client doit avoir son propre compte Geelark. Geelark est la plateforme de téléphones virtuels sur laquelle tournent les automations. Un guide de configuration est fourni à l'inscription.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Puis-je changer de plan ?</div>
-      <div class="faq-a">Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Le changement prend effet immédiatement.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Est-ce que ça fonctionne avec Threads ?</div>
-      <div class="faq-a">Oui ! WarmupOS supporte Instagram et Threads. Vous pouvez ajouter les deux types de comptes dans votre dashboard.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Que se passe-t-il si mon compte est banni ?</div>
-      <div class="faq-a">Vous pouvez supprimer le compte banni depuis le dashboard et en ajouter un nouveau en quelques secondes.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Y a-t-il un engagement ?</div>
-      <div class="faq-a">Aucun engagement pour les plans mensuels. Les plans annuels sont facturés en une fois pour l'année complète.</div>
-    </div>
-  </div>
-
 </div>
 
-<footer>
-  <div class="container">
-    WarmupOS — Automatisez votre warmup Instagram et Threads 🔥
+<!-- REGISTER -->
+<div class="auth-page" id="registerPage" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🔥</div>
+      <div class="auth-logo-text">Warmup<span>OS</span></div>
+    </div>
+    <div class="auth-title">Créer un compte</div>
+    <div class="auth-sub">Rejoins WarmupOS et automatise ton warmup</div>
+    <div class="auth-error" id="registerError"></div>
+    <div class="auth-success" id="registerSuccess"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="registerEmail" type="email" placeholder="ton@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input class="form-input" id="registerPassword" type="password" placeholder="Minimum 8 caractères">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe</label>
+      <input class="form-input" id="registerPassword2" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-auth btn-accent" id="registerBtn" onclick="register()">Créer mon compte</button>
+    <div class="auth-switch">Déjà un compte ? <a onclick="showLogin()">Se connecter</a></div>
   </div>
-</footer>
+</div>
+
+<!-- PENDING (en attente d'activation) -->
+<div class="pending-page" id="pendingPage">
+  <div class="pending-card">
+    <div class="pending-icon">⏳</div>
+    <div class="pending-title">Compte créé !</div>
+    <div class="pending-badge">En attente d'activation</div>
+    <div class="pending-text">
+      Ton compte a été créé avec succès. Notre équipe va l'activer dans les plus brefs délais — généralement sous 24h.
+    </div>
+    <div class="pending-steps">
+      <div class="pending-step">
+        <div class="step-num done">✓</div>
+        <span>Compte créé</span>
+      </div>
+      <div class="pending-step">
+        <div class="step-num">2</div>
+        <span>Activation par notre équipe</span>
+      </div>
+      <div class="pending-step">
+        <div class="step-num">3</div>
+        <span>Accès complet au dashboard</span>
+      </div>
+    </div>
+    <button class="btn-auth btn-outline" onclick="logout()">Se déconnecter</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard-page" id="dashboardPage">
+  <div class="container">
+    <header>
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-icon">🔥</div>
+          <div class="logo-text">Warmup<span>OS</span></div>
+        </div>
+        <div class="header-right">
+          <span class="user-email" id="userEmail"></span>
+          <span id="planBadge" style="padding:4px 12px;border-radius:100px;font-size:11px;font-family:'Space Mono',monospace;background:rgba(124,92,252,0.15);color:var(--accent);border:1px solid rgba(124,92,252,0.3)">—</span>
+          <button class="btn btn-ghost" onclick="loadAccounts()">↻ Actualiser</button>
+          <button class="btn btn-primary" onclick="openModal()">+ Ajouter</button>
+          <button class="btn btn-red" onclick="logout()">Déconnexion</button>
+          <div class="status-text"><div class="status-dot"></div>Actif</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Comptes actifs</div>
+        <div class="stat-value" style="color:var(--green)" id="statActifs">—</div>
+        <div class="stat-sub">en warmup</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total comptes</div>
+        <div class="stat-value" style="color:var(--accent)" id="statTotal">—</div>
+        <div class="stat-sub">dans Airtable</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dernier warmup</div>
+        <div class="stat-value" style="color:var(--yellow);font-size:20px" id="statDernier">—</div>
+        <div class="stat-sub">sur l'ensemble des comptes</div>
+      </div>
+    </div>
+
+    <!-- ONGLETS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('comptes', this)">📱 Mes comptes</button>
+      <button class="tab" onclick="switchTab('setup', this)">⚙️ Setup Geelark</button>
+    </div>
+
+    <!-- ONGLET COMPTES -->
+    <div class="tab-content active" id="tab-comptes">
+      <div id="accountsContainer">
+        <div class="loading"><div class="loading-spinner"></div>Chargement...</div>
+      </div>
+    </div>
+
+    <!-- ONGLET SETUP -->
+    <div class="tab-content" id="tab-setup">
+      <div class="setup-steps">
+        <div style="font-size:20px;font-weight:800;margin-bottom:24px">Comment configurer votre Geelark</div>
+        <div class="setup-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Créer un compte Geelark</div>
+            <div class="step-desc">Rendez-vous sur geelark.com et créez votre compte. Choisissez un plan selon le nombre de profils souhaités.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Ajouter vos profils Instagram/Threads</div>
+            <div class="step-desc">Dans Geelark → Profiles → New Profile. Installez Instagram, connectez-vous à votre compte et notez l'ID numérique de chaque profil.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Importer le Custom Task WarmupOS</div>
+            <div class="step-desc">Téléchargez le fichier JSON ci-dessous et importez-le dans Geelark → Automation → Custom tasks → Import.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Configurer la tâche récurrente</div>
+            <div class="step-desc">Cliquez sur les 3 points du flux → Create recurring task → Interval → 120 minutes → sélectionnez vos profils → Publish.</div>
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Ajouter vos profils dans le dashboard</div>
+            <div class="step-desc">Revenez sur l'onglet "Mes comptes" → cliquez sur "+ Ajouter" → entrez le nom et l'ID Geelark de chaque profil.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-grid">
+        <div class="setup-card">
+          <div class="setup-card-icon">📄</div>
+          <div class="setup-card-title">Guide de configuration</div>
+          <div class="setup-card-desc">Guide PDF complet étape par étape pour configurer votre compte Geelark et démarrer le warmup automatique.</div>
+          <a class="btn-download" href="https://flymagency.github.io/warmupos/WarmupOS_Setup_Guide.pdf" download target="_blank">⬇ Télécharger le guide PDF</a>
+        </div>
+        <div class="setup-card">
+          <div class="setup-card-icon">🤖</div>
+          <div class="setup-card-title">Custom Task WarmupOS</div>
+          <div class="setup-card-desc">Le script de warmup à importer dans Geelark. Il automatise le scroll du feed Instagram et des Reels avec comportement humain simulé.</div>
+          <a class="btn-download" href="https://flymagency.github.io/warmupos/Custom_tasks_Warump_EL_ROB_V3_.json" download target="_blank">⬇ Télécharger le Custom Task</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal ajout compte -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">➕ Ajouter un compte</div>
+    <label class="modal-label">Nom du compte</label>
+    <input class="modal-input" id="inputNom" type="text" placeholder="ex: @mon_compte">
+    <label class="modal-label">ID Geelark</label>
+    <input class="modal-input" id="inputGeelarkId" type="text" placeholder="ex: 619458412127715622">
+    <label class="modal-label">Plateforme</label>
+    <select class="modal-select" id="inputPlateforme">
+      <option value="Instagram">Instagram</option>
+      <option value="Threads">Threads</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="addAccount()">Ajouter</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  let billing = 'monthly';
+  const SUPABASE_URL = 'https://ibbwoisfffuxxvzxvvfu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_5xB76LyRq-yKT85CJr_wfw_7gQ5a6-O';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const API = 'https://weathered-scene-81a4.businessflymagency.workers.dev';
 
-  const prices = {
-    monthly: { starter: 20, pro: 50, agency: 100 },
-    annual: { starter: null, pro: 500, agency: 1000 }
-  };
+  let currentUserId = null;
+  let currentUserEmail = null;
 
-  function setBilling(type) {
-    billing = type;
-    document.getElementById('btnMonthly').classList.toggle('active', type === 'monthly');
-    document.getElementById('btnAnnual').classList.toggle('active', type === 'annual');
+  async function loadPlan() {
+    if (!currentUserEmail) return;
+    try {
+      const res = await fetch(`${API}/plan?userId=${encodeURIComponent(currentUserEmail)}`);
+      const data = await res.json();
+      const planNames = { starter: '⚡ Starter', pro: '🚀 Pro', agency: '🏢 Agency' };
+      const badge = document.getElementById('planBadge');
+      if (badge) {
+        const limitDisplay = (!data.limit || data.limit >= 9999) ? '∞' : data.limit;
+        badge.textContent = `${planNames[data.plan] || data.plan} — ${data.used}/${limitDisplay} comptes`;
+      }
+    } catch(e) { console.log('loadPlan error', e); }
+  }
 
-    // Starter — pas d'annuel
-    document.getElementById('price-starter').innerHTML = '20<span>€</span>';
-    document.getElementById('note-starter').textContent = '';
+  async function getCurrentUserId() {
+    if (currentUserId) return currentUserId;
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) currentUserId = user.id;
+    return currentUserId;
+  }
 
-    if (type === 'monthly') {
-      document.getElementById('price-pro').innerHTML = '50<span>€</span>';
-      document.getElementById('period-pro').textContent = '/mois — facturation mensuelle';
-      document.getElementById('note-pro').textContent = '';
+  function hideAll() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('registerPage').style.display = 'none';
+    document.getElementById('pendingPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'none';
+  }
 
-      document.getElementById('price-agency').innerHTML = '100<span>€</span>';
-      document.getElementById('period-agency').textContent = '/mois — facturation mensuelle';
-      document.getElementById('note-agency').textContent = '';
-    } else {
-      document.getElementById('price-pro').innerHTML = '500<span>€</span>';
-      document.getElementById('period-pro').textContent = '/an — soit 41€/mois';
-      document.getElementById('note-pro').textContent = '✓ 2 mois offerts vs mensuel';
+  function showLogin() {
+    hideAll();
+    document.getElementById('loginPage').style.display = 'flex';
+  }
 
-      document.getElementById('price-agency').innerHTML = '1000<span>€</span>';
-      document.getElementById('period-agency').textContent = '/an — soit 83€/mois';
-      document.getElementById('note-agency').textContent = '✓ 2 mois offerts vs mensuel';
+  function showRegister() {
+    hideAll();
+    document.getElementById('registerPage').style.display = 'flex';
+  }
+
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      handleUser(session.user);
     }
   }
+
+  async function handleUser(user) {
+    // Vérifie dans la table profiles si le client est activé
+    const { data, error } = await sb
+      .from('profiles')
+      .select('activated')
+      .eq('email', user.email)
+      .single();
+
+    if (data && data.activated === true) {
+      currentUserId = user.id;
+      currentUserEmail = user.email;
+      hideAll();
+      document.getElementById('dashboardPage').style.display = 'block';
+      document.getElementById('userEmail').textContent = user.email;
+      loadAccounts();
+      loadPlan();
+    } else {
+      hideAll();
+      document.getElementById('pendingPage').style.display = 'flex';
+    }
+  }
+
+  async function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errorEl = document.getElementById('loginError');
+    btn.disabled = true;
+    btn.textContent = 'Connexion...';
+    errorEl.style.display = 'none';
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      errorEl.textContent = 'Email ou mot de passe incorrect';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Se connecter';
+    } else {
+      handleUser(data.user);
+    }
+  }
+
+  async function register() {
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const password2 = document.getElementById('registerPassword2').value;
+    const btn = document.getElementById('registerBtn');
+    const errorEl = document.getElementById('registerError');
+    const successEl = document.getElementById('registerSuccess');
+    
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (password !== password2) {
+      errorEl.textContent = 'Les mots de passe ne correspondent pas';
+      errorEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 8) {
+      errorEl.textContent = 'Le mot de passe doit faire au moins 8 caractères';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Création...';
+
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) {
+      errorEl.textContent = error.message;
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Créer mon compte';
+    } else {
+      // Crée le profil dans la table profiles avec activated = false
+      await sb.from('profiles').insert({ email, activated: false });
+      hideAll();
+      document.getElementById('pendingPage').style.display = 'flex';
+    }
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    showLogin();
+  }
+
+  function timeAgo(dateStr) {
+    if (!dateStr) return 'Jamais';
+    // Gère le format YYYY-MM-DD et ISO
+    const date = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T12:00:00');
+    if (isNaN(date.getTime())) return 'Jamais';
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 0) return "Aujourd'hui";
+    if (diff < 60) return 'Il y a ' + diff + 's';
+    if (diff < 3600) return 'Il y a ' + Math.floor(diff/60) + 'min';
+    if (diff < 86400) return 'Il y a ' + Math.floor(diff/3600) + 'h';
+    return 'Il y a ' + Math.floor(diff/86400) + 'j';
+  }
+
+  async function loadAccounts() {
+    const container = document.getElementById('accountsContainer');
+    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Chargement...</div>';
+    try {
+      const userId = currentUserEmail || await getCurrentUserId();
+      const res = await fetch(`${API}/accounts?userId=${userId || ''}`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      const records = data.records || [];
+      document.getElementById('statTotal').textContent = records.length;
+      document.getElementById('statActifs').textContent = records.length;
+      let lastDate = null;
+      records.forEach(r => {
+        const d = r.fields['Derniere action'];
+        if (d && (!lastDate || new Date(d) > new Date(lastDate))) lastDate = d;
+      });
+      document.getElementById('statDernier').textContent = timeAgo(lastDate);
+      if (records.length === 0) {
+        container.innerHTML = '<div class="loading">Aucun compte — ajoutez-en un !</div>';
+        return;
+      }
+      let html = '<div class="accounts-grid">';
+      records.forEach((record, i) => {
+        const f = record.fields;
+        const nom = f['Nom du compte'] || 'Compte ' + (i+1);
+        const id = f['ID Geelark'] || '';
+        const plateforme = f['Plateforme'] || 'Instagram';
+        const derniereAction = f['Derniere action'] || null;
+        html += `
+          <div class="account-card active" style="animation-delay:${i*0.1}s">
+            <div class="account-header">
+              <div>
+                <div class="account-name">${nom}</div>
+                <div class="account-platform"><div class="platform-dot"></div>${plateforme}</div>
+              </div>
+              <div class="status-badge active">Actif</div>
+            </div>
+            <div class="last-action" style="display:flex;align-items:center;justify-content:space-between">
+              <span>🕐 Dernier warmup : <strong>${timeAgo(derniereAction)}</strong></span>
+              <span id="status-${record.id}" class="status-idle">Inactif</span>
+            </div>
+            <div class="last-action" style="margin-top:6px">📅 Progression : <strong>Jour ${f['Jour warmup'] || 1} / 30</strong>
+              <div style="margin-top:6px;height:4px;background:var(--surface2);border-radius:100px;overflow:hidden">
+                <div style="height:100%;width:${Math.min(((f['Jour warmup']||1)/30)*100,100)}%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:100px"></div>
+              </div>
+            </div>
+            <div class="account-actions">
+              <button class="btn btn-green" style="flex:1" onclick="launchWarmup('${id}', '${record.id}', this)">▶ Lancer warmup</button>
+              <button class="btn-danger" onclick="deleteAccount('${record.id}', '${nom}', this)">🗑</button>
+            </div>
+            <div class="warmup-result" id="result-${record.id}"></div>
+            <div class="geelark-id">ID: ${id}</div>
+          </div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+      // Vérifie les statuts en temps réel
+      checkStatuses(records);
+      // Revérifie toutes les 30 secondes
+      clearInterval(window.statusInterval);
+      window.statusInterval = setInterval(() => checkStatuses(records), 30000);
+    } catch (err) {
+      container.innerHTML = `<div class="loading" style="color:var(--accent2)">⚠ Erreur: ${err.message}</div>`;
+    }
+  }
+
+  async function checkStatuses(records) {
+    const taskIds = records
+      .filter(r => r.fields['task_id'])
+      .map(r => r.fields['task_id']);
+    
+    if (taskIds.length === 0) return;
+
+    try {
+      const res = await fetch(`${API}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskIds })
+      });
+      const data = await res.json();
+      if (!data.data || !data.data.items) return;
+
+      // Map task_id -> envId -> status
+      data.data.items.forEach(task => {
+        records.forEach(record => {
+          if (record.fields['task_id'] === task.id) {
+            const statusEl = document.getElementById('status-' + record.id);
+            if (!statusEl) return;
+            if (task.status === 1 || task.status === 2) {
+              statusEl.className = 'status-running';
+              statusEl.textContent = task.status === 1 ? 'En attente' : 'En cours...';
+            } else {
+              statusEl.className = 'status-idle';
+              statusEl.textContent = task.status === 3 ? 'Terminé' : 'Inactif';
+            }
+          }
+        });
+      });
+    } catch(e) {}
+  }
+
+  async function launchWarmup(profileId, recordId, btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Lancement...';
+    const resultEl = document.getElementById('result-' + recordId);
+    try {
+      const res = await fetch(`${API}/warmup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileId, recordId })
+      });
+      const data = await res.json();
+      resultEl.style.display = 'block';
+      if (data.code === 0) {
+        resultEl.className = 'warmup-result success';
+        resultEl.textContent = '✓ Warmup lancé !';
+        btn.textContent = '✓ Lancé';
+        // Met à jour le badge statut immédiatement
+        const statusEl = document.getElementById('status-' + recordId);
+        if (statusEl) {
+          statusEl.className = 'status-running';
+          statusEl.textContent = 'En attente...';
+        }
+      } else {
+        resultEl.className = 'warmup-result error';
+        resultEl.textContent = '⚠ ' + (data.msg || 'Erreur');
+        btn.textContent = '▶ Réessayer';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      resultEl.style.display = 'block';
+      resultEl.className = 'warmup-result error';
+      resultEl.textContent = '⚠ Erreur réseau';
+      btn.textContent = '▶ Réessayer';
+      btn.disabled = false;
+    }
+  }
+
+  async function addAccount() {
+    const nom = document.getElementById('inputNom').value.trim();
+    const geelarkId = document.getElementById('inputGeelarkId').value.trim();
+    const plateforme = document.getElementById('inputPlateforme').value;
+    if (!nom || !geelarkId) { alert('Remplis tous les champs !'); return; }
+    try {
+      const userId2 = await getCurrentUserId();
+      const res = await fetch(`${API}/add-account`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom, geelarkId, plateforme, userId: currentUserEmail || userId2 })
+      });
+      const data = await res.json();
+      if (data.id) { closeModal(); loadAccounts(); }
+      else alert('Erreur lors de l\'ajout');
+    } catch (err) { alert('Erreur réseau'); }
+  }
+
+  async function deleteAccount(recordId, nom, btn) {
+    if (!confirm('Supprimer "' + nom + '" ? Cette action est irréversible.')) return;
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      const res = await fetch(`${API}/delete-account`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId })
+      });
+      const data = await res.json();
+      if (data.deleted) {
+        loadAccounts();
+      } else {
+        alert('Erreur lors de la suppression');
+        btn.disabled = false;
+        btn.textContent = '🗑';
+      }
+    } catch(err) {
+      alert('Erreur réseau');
+      btn.disabled = false;
+      btn.textContent = '🗑';
+    }
+  }
+
+  function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+  function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+
+  checkSession();
+  setInterval(loadAccounts, 300000);
 </script>
 </body>
 </html>

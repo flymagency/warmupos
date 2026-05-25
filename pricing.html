@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WarmupOS — Pricing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --accent: #7c5cfc;
+      --green: #2dfc8e;
+      --yellow: #fcdc2d;
+      --text: #e8e8f0;
+      --muted: #6b6b88;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glow */
+    .glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* NAV */
+    nav {
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 80px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    .nav-cta {
+      padding: 10px 24px;
+      background: var(--accent);
+      color: white;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav-cta:hover { background: #9b7ffd; transform: scale(1.02); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(45,252,142,0.08);
+      border: 1px solid rgba(45,252,142,0.2);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--green);
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 24px;
+      animation: fadeDown 0.6s ease forwards;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s 0.1s ease forwards;
+      opacity: 0;
+    }
+
+    .hero-title span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+      animation: fadeUp 0.6s 0.2s ease forwards;
+      opacity: 0;
+    }
+
+    /* TOGGLE BILLING */
+    .billing-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.6s 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .toggle-btn {
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .save-badge {
+      padding: 4px 10px;
+      background: rgba(252,220,45,0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(252,220,45,0.3);
+      border-radius: 100px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* PRICING CARDS */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 80px;
+      animation: fadeUp 0.6s 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .plan-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(124,92,252,0.12);
+    }
+
+    .plan-card.popular {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(124,92,252,0.08), var(--surface));
+    }
+
+    .plan-card.popular::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 5px 12px;
+      background: var(--accent);
+      color: white;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .plan-name {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      margin-bottom: 8px;
+    }
+
+    .plan-amount {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    .plan-amount span {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .plan-period {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      height: 20px;
+    }
+
+    .plan-annual-note {
+      font-size: 12px;
+      color: var(--green);
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 24px;
+      height: 18px;
+    }
+
+    .plan-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 24px;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(45,252,142,0.12);
+      color: var(--green);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .plan-features li.muted {
+      color: var(--muted);
+    }
+
+    .plan-features li.muted::before {
+      content: '—';
+      background: var(--surface2);
+      color: var(--muted);
+    }
+
+    .plan-cta {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .plan-cta.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .plan-cta.primary:hover { background: #9b7ffd; }
+
+    .plan-cta.ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .plan-cta.ghost:hover { border-color: var(--accent); }
+
+    /* FAQ */
+    .faq-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 40px;
+      letter-spacing: -1px;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item:hover { border-color: var(--accent); }
+
+    .faq-q {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .faq-a {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .hero-title { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+<body>
+<div class="glow"></div>
+
+<div class="container">
+  <nav>
+    <a href="#" class="logo">
+      <div class="logo-icon">🔥</div>
+      <div class="logo-text">Warmup<span>OS</span></div>
+    </a>
+    <a href="app.html" class="nav-cta">Commencer →</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge">Warmup automatique 24/7</div>
+    <h1 class="hero-title">Un prix simple.<br>Des résultats <span>réels</span>.</h1>
+    <p class="hero-sub">automatisez le warmup de vos comptes instagram et threads. augmentez votre portée organique sans effort.</p>
+
+    <div class="billing-toggle">
+      <button class="toggle-btn active" id="btnMonthly" onclick="setBilling('monthly')">Mensuel</button>
+      <button class="toggle-btn" id="btnAnnual" onclick="setBilling('annual')">Annuel <span class="save-badge">-17%</span></button>
+    </div>
+  </div>
+
+  <div class="pricing-grid">
+
+    <!-- STARTER -->
+    <div class="plan-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">
+        <div class="plan-amount" id="price-starter">20<span>€</span></div>
+      </div>
+      <div class="plan-period">/mois — facturation mensuelle</div>
+      <div class="plan-annual-note" id="note-starter"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>3 comptes Instagram/Threads</li>
+        <li>Warmup automatique toutes les 2h</li>
+        <li>Dashboard de monitoring</li>
+        <li>Scroll feed + Reels</li>
+        <li>Support par email</li>
+        <li class="muted">Annuel non disponible</li>
+      </ul>
+      <a href="app.html" class="plan-cta ghost">Commencer →</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan-card popular">
+      <div class="popular-badge">Populaire</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">
+        <div class="plan-amount" id="price-pro">50<span>€</span></div>
+      </div>
+      <div class="plan-period" id="period-pro">/mois — facturation mensuelle</div>
+      <div class="plan-annual-note" id="note-pro"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>10 comptes Instagram/Threads</li>
+        <li>Warmup automatique toutes les 2h</li>
+        <li>Dashboard de monitoring</li>
+        <li>Scroll feed + Reels + Likes</li>
+        <li>Support prioritaire</li>
+        <li>Option annuel disponible</li>
+      </ul>
+      <a href="app.html" class="plan-cta primary">Commencer →</a>
+    </div>
+
+    <!-- AGENCY -->
+    <div class="plan-card">
+      <div class="plan-name">Agency</div>
+      <div class="plan-price">
+        <div class="plan-amount" id="price-agency">100<span>€</span></div>
+      </div>
+      <div class="plan-period" id="period-agency">/mois — facturation mensuelle</div>
+      <div class="plan-annual-note" id="note-agency"></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Comptes illimités</li>
+        <li>Warmup automatique toutes les 2h</li>
+        <li>Dashboard de monitoring</li>
+        <li>Scroll feed + Reels + Likes</li>
+        <li>Support dédié</li>
+        <li>Option annuel disponible</li>
+      </ul>
+      <a href="app.html" class="plan-cta ghost">Commencer →</a>
+    </div>
+
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-title">Questions fréquentes</div>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <div class="faq-q">Comment fonctionne le warmup ?</div>
+      <div class="faq-a">WarmupOS simule un comportement humain naturel sur Instagram et Threads — scroll du feed, visionnage des Reels, likes aléatoires. Tout est automatisé toutes les 2 heures.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Ai-je besoin d'un compte Geelark ?</div>
+      <div class="faq-a">Oui, chaque client doit avoir son propre compte Geelark. Geelark est la plateforme de téléphones virtuels sur laquelle tournent les automations. Un guide de configuration est fourni à l'inscription.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Puis-je changer de plan ?</div>
+      <div class="faq-a">Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Le changement prend effet immédiatement.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Est-ce que ça fonctionne avec Threads ?</div>
+      <div class="faq-a">Oui ! WarmupOS supporte Instagram et Threads. Vous pouvez ajouter les deux types de comptes dans votre dashboard.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Que se passe-t-il si mon compte est banni ?</div>
+      <div class="faq-a">Vous pouvez supprimer le compte banni depuis le dashboard et en ajouter un nouveau en quelques secondes.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Y a-t-il un engagement ?</div>
+      <div class="faq-a">Aucun engagement pour les plans mensuels. Les plans annuels sont facturés en une fois pour l'année complète.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    WarmupOS — Automatisez votre warmup Instagram et Threads 🔥
+  </div>
+</footer>
+
+<script>
+  let billing = 'monthly';
+
+  const prices = {
+    monthly: { starter: 20, pro: 50, agency: 100 },
+    annual: { starter: null, pro: 500, agency: 1000 }
+  };
+
+  function setBilling(type) {
+    billing = type;
+    document.getElementById('btnMonthly').classList.toggle('active', type === 'monthly');
+    document.getElementById('btnAnnual').classList.toggle('active', type === 'annual');
+
+    // Starter — pas d'annuel
+    document.getElementById('price-starter').innerHTML = '20<span>€</span>';
+    document.getElementById('note-starter').textContent = '';
+
+    if (type === 'monthly') {
+      document.getElementById('price-pro').innerHTML = '50<span>€</span>';
+      document.getElementById('period-pro').textContent = '/mois — facturation mensuelle';
+      document.getElementById('note-pro').textContent = '';
+
+      document.getElementById('price-agency').innerHTML = '100<span>€</span>';
+      document.getElementById('period-agency').textContent = '/mois — facturation mensuelle';
+      document.getElementById('note-agency').textContent = '';
+    } else {
+      document.getElementById('price-pro').innerHTML = '500<span>€</span>';
+      document.getElementById('period-pro').textContent = '/an — soit 41€/mois';
+      document.getElementById('note-pro').textContent = '✓ 2 mois offerts vs mensuel';
+
+      document.getElementById('price-agency').innerHTML = '1000<span>€</span>';
+      document.getElementById('period-agency').textContent = '/an — soit 83€/mois';
+      document.getElementById('note-agency').textContent = '✓ 2 mois offerts vs mensuel';
+    }
+  }
+</script>
+</body>
+</html>
